@@ -1,0 +1,9 @@
+[12/12/2024 23:19:55] - [STARTING] Server is listening on ('192.168.31.105', 65432)
+[12/12/2024 23:19:57] - [ACTIVE CONNECTION] 1
+[12/12/2024 23:19:57] - [NEW CONNECTION] ('192.168.31.105', 58708) connected.
+[12/12/2024 23:19:59] - [LOGIN SUCCESSFULLY] admin
+[12/12/2024 23:20:13] - [admin] upload D:/Năm 2/Đề-chính-thức-Sinh-học-các-năm-phần-đoạn-văn (3).pdf
+[12/12/2024 23:20:23] - File received successfully.
+[12/12/2024 23:20:27] - [admin] logout
+[12/12/2024 23:20:27] - [LOGOUT SUCCESSFULLY] admin
+[12/12/2024 23:20:28] - Disconnected from ('192.168.31.105', 58708)
