@@ -84,9 +84,7 @@ def client_login(conn):
             conn.send(str(1).encode(FORMAT)) #Gửi phản hồi đăng nhập đúng
             logging.info(f"[LOGIN SUCCESSFULLY] {userName}")
             return True, userName
-        else:
-            conn.send(str(0).encode(FORMAT)) #Gửi phản hồi đăng nhập sai. 
-            return False, userName
+    conn.send(str(0).encode(FORMAT)) #Gửi phản hồi đăng nhập sai. 
     return False, userName
 
 def main(conn, addr, userName, isLogined):

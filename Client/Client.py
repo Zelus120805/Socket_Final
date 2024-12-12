@@ -229,18 +229,62 @@ def main(username):
             return isUploaded
 
     def upload_folder(folderPath):
+        def close_progress_bar_window():
+            nonlocal isUploading
+            isUploading = False  # Hủy upload
+            progress_label.config(text="Upload canceled!")
+            upload_window.destroy()
+
+        def calculate_total_bytes(folderPath):
+            """Tính tổng số bytes của toàn bộ thư mục."""
+            total = 0
+            for root, _, files in os.walk(folderPath):
+                for file_name in files:
+                    total += os.path.getsize(os.path.join(root, file_name))
+            return total
+
         try:
-            # Gửi lệnh upload_folder kèm theo tên thư mục gốc
+            # Tạo cửa sổ progress bar
+            upload_window = tk.Toplevel()
+            upload_window.title("Uploading Folder")
+            upload_window.geometry("400x150")
+            upload_window.protocol("WM_DELETE_WINDOW", close_progress_bar_window)
+
+            progress_label = tk.Label(upload_window, text="Uploading...", font=("Arial", 14))
+            progress_label.pack(pady=10)
+
+            progress_bar = ttk.Progressbar(upload_window, orient="horizontal", mode="determinate", length=300)
+            progress_bar.pack(pady=20)
+            progress_bar["value"] = 0
+
+            percent_label = tk.Label(upload_window, text="0%", font=("Arial", 12))
+            percent_label.pack(pady=5)
+
+            # Tính tổng số bytes cần tải
+            total_bytes = calculate_total_bytes(folderPath)
+            uploaded_bytes = 0
+
+            # Gửi tên thư mục gốc
             folder_name = os.path.basename(folderPath)
             send_message(folder_name)  # Gửi tên thư mục gốc
-            # Duyệt qua toàn bộ thư mục và gửi các file/folder
+
+            # Bắt đầu upload
+            isUploading = True
             for root, dirs, files in os.walk(folderPath):
+                if not isUploading:
+                    break  # Dừng nếu người dùng hủy
+
+                # Gửi các thư mục
                 for dir_name in dirs:
                     dir_path = os.path.relpath(os.path.join(root, dir_name), folderPath)
                     send_message(dir_path)  # Gửi đường dẫn thư mục
                     send_message("FOLDER")  # Gửi tín hiệu là thư mục
 
+                # Gửi các file
                 for file_name in files:
+                    if not isUploading:
+                        break
+
                     file_path = os.path.join(root, file_name)
                     relative_path = os.path.relpath(file_path, folderPath)
                     send_message(relative_path)  # Gửi đường dẫn file
@@ -252,16 +296,31 @@ def main(username):
                             chunk_size = len(chunk)
                             client.send(f"{chunk_size}".encode(FORMAT).ljust(HEADER))
                             client.send(chunk)
+                            uploaded_bytes += chunk_size
 
-                    client.send(f"{0}".encode(FORMAT).ljust(HEADER))  # Tín hiệu kết thúc file
+                            # Cập nhật giao diện progress bar
+                            percent = (uploaded_bytes / total_bytes) * 100
+                            progress_bar["value"] = percent
+                            percent_label.config(text=f"{percent:.2f}%")
+                            upload_window.update_idletasks()
 
-            send_message("END")  # Tín hiệu kết thúc quá trình upload
-            #print("Folder uploaded successfully!")
+                        client.send(f"{0}".encode(FORMAT).ljust(HEADER))  # Tín hiệu kết thúc file
 
+            # Gửi tín hiệu kết thúc upload
+            send_message("END")
+            if isUploading:
+                progress_label.config(text="Upload completed!")
+                progress_bar["value"] = 100
+            else:
+                progress_label.config(text="Upload canceled!")
+            upload_window.after(2000, upload_window.destroy)
+            print("Folder uploaded successfully!")
             return True
-        except Exception as e:
-            #print(f"Error uploading folder: {e}")
 
+        except Exception as e:
+            print(f"Error uploading folder: {e}")
+            progress_label.config(text="Upload failed!")
+            upload_window.after(2000, upload_window.destroy)
             return False
 
     def show_list_file():

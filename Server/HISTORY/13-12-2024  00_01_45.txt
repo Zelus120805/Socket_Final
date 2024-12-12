@@ -1,0 +1,52 @@
+[13/12/2024 00:01:45] - [STARTING] Server is listening on ('192.168.1.24', 65432)
+[13/12/2024 00:01:49] - [ACTIVE CONNECTION] 1
+[13/12/2024 00:01:49] - [NEW CONNECTION] ('192.168.1.24', 56343) connected.
+[13/12/2024 00:02:04] - [LOGIN SUCCESSFULLY] tienthanh
+[13/12/2024 00:02:17] - [Client - tienthanh] upload C:/Users/ADMIN/Downloads/LA-LUNG-Original-Vu.mp3
+[13/12/2024 00:04:10] - File received successfully.
+[13/12/2024 00:04:20] - [Client - tienthanh] view
+[13/12/2024 00:04:48] - [Client - tienthanh] download Logic-Logic-mệnh-đề.pdf
+[13/12/2024 00:04:48] - file sended successfully.
+[13/12/2024 00:05:00] - [Client - tienthanh] 1
+[13/12/2024 00:05:12] - [Client - tienthanh] view
+[13/12/2024 00:05:46] - Disconnected from ('192.168.1.24', 56343)
+[13/12/2024 00:05:50] - [ACTIVE CONNECTION] 1
+[13/12/2024 00:05:50] - [NEW CONNECTION] ('192.168.1.24', 56378) connected.
+[13/12/2024 00:06:03] - [LOGIN SUCCESSFULLY] admin
+[13/12/2024 00:06:07] - [Client - admin] view
+[13/12/2024 00:08:17] - [Client - admin] logout
+[13/12/2024 00:08:17] - [LOGOUT SUCCESSFULLY] admin
+[13/12/2024 00:08:18] - Disconnected from ('192.168.1.24', 56378)
+[13/12/2024 00:08:24] - [ACTIVE CONNECTION] 1
+[13/12/2024 00:08:24] - [NEW CONNECTION] ('192.168.1.24', 56393) connected.
+[13/12/2024 00:08:31] - [ACTIVE CONNECTION] 2
+[13/12/2024 00:08:31] - [NEW CONNECTION] ('192.168.1.24', 56400) connected.
+[13/12/2024 00:08:34] - [LOGIN SUCCESSFULLY] admin
+[13/12/2024 00:08:44] - [LOGIN SUCCESSFULLY] tienthanh
+[13/12/2024 00:08:50] - [Client - tienthanh] hi
+[13/12/2024 00:08:57] - [Client - tienthanh] logout
+[13/12/2024 00:08:57] - [LOGOUT SUCCESSFULLY] tienthanh
+[13/12/2024 00:08:59] - Disconnected from ('192.168.1.24', 56393)
+[13/12/2024 00:09:00] - [Client - admin] logout
+[13/12/2024 00:09:00] - [LOGOUT SUCCESSFULLY] admin
+[13/12/2024 00:09:01] - Disconnected from ('192.168.1.24', 56400)
+[13/12/2024 00:10:46] - [ACTIVE CONNECTION] 1
+[13/12/2024 00:10:46] - [NEW CONNECTION] ('192.168.1.24', 56423) connected.
+[13/12/2024 00:10:49] - [LOGIN SUCCESSFULLY] admin
+[13/12/2024 00:10:52] - [Client - admin] view
+[13/12/2024 00:11:13] - Disconnected from ('192.168.1.24', 56423)
+[13/12/2024 00:30:50] - [ACTIVE CONNECTION] 1
+[13/12/2024 00:30:50] - [NEW CONNECTION] ('192.168.1.24', 56630) connected.
+[13/12/2024 00:30:52] - [LOGIN SUCCESSFULLY] admin
+[13/12/2024 00:31:05] - [Client - admin] upload_folder C:/Users/ADMIN/Downloads/Data BT2
+[13/12/2024 00:31:05] - Folder received successfully.
+[13/12/2024 00:31:23] - [Client - admin] upload_folder C:/Users/ADMIN/Downloads/23120357
+[13/12/2024 00:31:23] - Folder received successfully.
+[13/12/2024 00:31:26] - Disconnected from ('192.168.1.24', 56630)
+[13/12/2024 00:33:40] - [ACTIVE CONNECTION] 1
+[13/12/2024 00:33:40] - [NEW CONNECTION] ('192.168.1.24', 56667) connected.
+[13/12/2024 00:33:45] - [LOGIN SUCCESSFULLY] admin
+[13/12/2024 00:34:02] - [Client - admin] upload_folder D:/23120357_w04
+[13/12/2024 00:34:27] - Folder received successfully.
+[13/12/2024 00:34:31] - [Client - admin] view
+[13/12/2024 00:34:43] - Disconnected from ('192.168.1.24', 56667)

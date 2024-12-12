@@ -1,0 +1,25 @@
+[12/12/2024 23:48:04] - [STARTING] Server is listening on ('192.168.1.24', 65432)
+[12/12/2024 23:48:34] - [ACTIVE CONNECTION] 1
+[12/12/2024 23:48:34] - [NEW CONNECTION] ('192.168.1.24', 56224) connected.
+[12/12/2024 23:49:13] - Disconnected from ('192.168.1.24', 56224)
+[12/12/2024 23:49:26] - [ACTIVE CONNECTION] 1
+[12/12/2024 23:49:26] - [NEW CONNECTION] ('192.168.1.24', 56231) connected.
+[12/12/2024 23:50:05] - Disconnected from ('192.168.1.24', 56231)
+[12/12/2024 23:50:22] - [ACTIVE CONNECTION] 1
+[12/12/2024 23:50:22] - [NEW CONNECTION] ('192.168.1.24', 56241) connected.
+[12/12/2024 23:50:25] - [LOGIN SUCCESSFULLY] admin
+[12/12/2024 23:50:31] - [Client - admin] logout
+[12/12/2024 23:50:31] - [LOGOUT SUCCESSFULLY] admin
+[12/12/2024 23:50:35] - [LOGIN SUCCESSFULLY] admin
+[12/12/2024 23:50:49] - [Client - admin] upload C:/Users/ADMIN/Downloads/Gioi-thieu-CN-2022_giao-vu.pdf
+[12/12/2024 23:51:43] - File received successfully.
+[12/12/2024 23:52:16] - [Client - admin] upload_folder C:/Users/ADMIN/Downloads/Data BT2
+[12/12/2024 23:52:17] - Folder received successfully.
+[12/12/2024 23:57:31] - [Client - admin] view
+[12/12/2024 23:57:51] - [Client - admin] download LA-LUNG-Original-Vu.mp3
+[12/12/2024 23:57:51] - file sended successfully.
+[12/12/2024 23:59:44] - [Client - admin] 1
+[13/12/2024 00:01:24] - [Client - admin] hi
+[13/12/2024 00:01:35] - [Client - admin] logout
+[13/12/2024 00:01:35] - [LOGOUT SUCCESSFULLY] admin
+[13/12/2024 00:01:36] - Disconnected from ('192.168.1.24', 56241)
