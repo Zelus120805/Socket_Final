@@ -98,7 +98,7 @@ def main(conn, addr, userName, isLogined):
         filePath = ""
 
         if len(parts) < 2:
-                command=parts[0]
+            command=parts[0]
         else:
             command = parts[0]
             filePath = parts[1]
@@ -106,11 +106,8 @@ def main(conn, addr, userName, isLogined):
             filePath.strip()
             if filePath.startswith('"') and filePath.endswith('"'):
                 filePath = filePath[1:-1]
-            if not os.path.exists(filePath) and command == 'upload':
-                print("Your path isn't exists")
 
         return command, filePath
-
     def receive_file_from_client(conn, filePath):
         saveDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f"DOWNLOADS\\{userName}")
         if not os.path.exists(saveDir):
@@ -137,25 +134,31 @@ def main(conn, addr, userName, isLogined):
         savePath = os.path.join(saveDir, fileName)
         fout = open(savePath, "wb") #Tạo một file mới để ghi dữ liệu vào, mở chế độ nhị phân
 
+        total = int(conn.recv(HEADER).decode(FORMAT))
+        bytes = 0
+        if (bytes == total):
+            return
+        
         try:
             while True:
                 # Tin nhắn đầu tiên là độ dài của nội dung mà server có thể nhận
-                fileLength = conn.recv(HEADER).decode(FORMAT)
+                #fileLength = conn.recv(HEADER).decode(FORMAT)
                 
-                if not fileLength:
-                    break  # Nếu fileLength rỗng, thoát vòng lặp
-                fileLength = int(fileLength) #Chuyển kích thước dạng chuỗi về dạng số nguyên
+                # if not fileLength:
+                #     break  # Nếu fileLength rỗng, thoát vòng lặp
+                # fileLength = int(fileLength) #Chuyển kích thước dạng chuỗi về dạng số nguyên
                 
-                if fileLength == 0: #Đến khi hết dữ liệu thì không ghi nữa, thoát vòng lặp 
-                    break
+                # if fileLength == 0: #Đến khi hết dữ liệu thì không ghi nữa, thoát vòng lặp 
+                #     break
                 
-                data = conn.recv(fileLength)
-                
-                if not data:    
+                data = conn.recv(HEADER)
+                bytes += len(data)
+                # Ghi dữ liệu vào file  
+                if bytes>=total:
                     break  # Nếu không có dữ liệu, thoát vòng lặp
                 fout.write(data)  # Ghi dữ liệu vào file
         except Exception as e:
-            #print(f"Error receiving file: {e}")
+            print(f"Error receiving file: {e}")
             logging.error("File received unsuccessfully.")
             conn.send("Uploaded unsuccessfully!".encode(FORMAT))
             fout.close()
@@ -165,7 +168,6 @@ def main(conn, addr, userName, isLogined):
         # Gửi phản hồi về client sau khi hoàn tất
         conn.send("Uploaded successfully!".encode(FORMAT))    
         fout.close()
-
     def receive_folder_from_client(conn, base_dir):
         try:
             os.makedirs(base_dir, exist_ok=True)  # Đảm bảo thư mục DOWNLOADS tồn tại
@@ -203,8 +205,7 @@ def main(conn, addr, userName, isLogined):
             logging.error("Folder received unsuccessfully.")
 
     downloads = {}
-    def send_file_to_client(socketClient, fileName):
-        filePath = downloads[fileName]
+    def send_file_to_client(socketClient, filePath):
         #print(filePath)
         try:
             fin = open(filePath, "rb")
@@ -257,7 +258,7 @@ def main(conn, addr, userName, isLogined):
             size, date = get_info(itemPath)
             #Tạo một node mới và thêm vào con của thư mục hiện tại
             newNode = Node(item, size, date, itemPath)
-            downloads[newNode.name] = newNode.path
+            #downloads[newNode.name] = newNode.path
             root.add_child(newNode)
             #Nếu đó node đó là thư mục, duyệt tiếp thư mục con đó.
             if os.path.isdir(itemPath):
@@ -302,6 +303,8 @@ def main(conn, addr, userName, isLogined):
         send_message(socketClient,str(root.size))
         #Gửi ngày sửa đổi
         send_message(socketClient,str(root.dateModified))
+        
+        send_message(socketClient,str(root.path))
         #Duyệt qua các con của nó và tiếp tục gửi theo tiền thứ tự.
     #  print((len(root.children),root.name,root.size,root.dateModified))
         for child in root.children:
@@ -323,13 +326,13 @@ def main(conn, addr, userName, isLogined):
         while True:
             requestContent = receive_message(conn)
             logging.info(f"[Client - {userName}] {requestContent}")
+            if requestContent.strip().lower() == 'close':
+                conn.close()
+                return False
+            
             command = ""
             filePath = ""
             command, filePath = normalize_input(requestContent)
-            
-            if command.strip().lower() == 'close':
-                conn.close()
-                return False
             
             if command.strip().lower() == 'logout':
                 logging.info(f"[LOGOUT SUCCESSFULLY] {userName}")
@@ -344,7 +347,7 @@ def main(conn, addr, userName, isLogined):
                 send_list_file_to_client_v2(conn,addr)
             elif command.strip().lower()=='download':
                 send_file_to_client(conn,filePath)
-    except: 
+    except:
         conn.close()
         return
     

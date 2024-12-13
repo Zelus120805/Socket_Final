@@ -29,10 +29,11 @@ directoryPath = ''
 
 #Tổ chức cấu trúc cây để phân cấp thư mục. 
 class Node:
-    def __init__(self, fileName, size, dateModified):
+    def __init__(self, fileName, size, dateModified, path):
         self.name = fileName
         self.size = size
         self.dateModified = dateModified
+        self.path = path
         self.children = []
     def add_child(self, newNode):
         self.children.append(newNode)
@@ -134,7 +135,7 @@ def main(username):
                     warn="Your path isn't exists"
 
         return command, path, warn
-
+    stop_uploading = 0
     def upload_file(filePath):
             isUploaded = False
 
@@ -163,17 +164,20 @@ def main(username):
             
             sizeOfFile = os.path.getsize(filePath)  # Lấy kích thước file
             totalBytes = 0  # Tính toán tổng số bytes đã tải
-            startTime = time.time()  # Thời điểm bắt đầu
-            
+
+            sendLength = str(sizeOfFile).encode(FORMAT)
+            sendLength += b' ' * (HEADER - len(sendLength))
+            client.send(sendLength)
+
             def finish_progress():
                 nonlocal isUploaded
                 # Gửi tín hiệu kết thúc file
-                sendLength = str(0).encode(FORMAT)
-                sendLength += b' ' * (HEADER - len(sendLength))
-                client.send(sendLength)
+                # sendLength = str("END").encode(FORMAT)
+                # sendLength += b' ' * (HEADER - len(sendLength))
+                # client.send(sendLength)
                 
-                response = client.recv(2048).decode(FORMAT)
-                #print(f"\n[SERVER RESPONSE]: {response}")
+                response = client.recv(HEADER).decode(FORMAT)
+                print(f"\n[SERVER RESPONSE]: {response}")
                 
                 # Đóng file
                 fin.close()
@@ -191,38 +195,38 @@ def main(username):
                     isUploaded = False
                     return False
                 
-            
             def upload_progress():
-                        # Dùng nonlocal để truy cập biến từ ngoài hàm
+                # Dùng nonlocal để truy cập biến từ ngoài hàm
                 nonlocal totalBytes, sizeOfFile
                 if totalBytes >= sizeOfFile:
                     return finish_progress()  # Kết thúc upload nếu tải xong
+                while (True):
+                    try:
+                        data = fin.read(HEADER)
+                        if not data:
+                            return finish_progress()  # Nếu không còn dữ liệu, kết thúc
+                        
+                        # finLength = len(data)
+                        # sendLength = str(finLength).encode(FORMAT)
+                        # sendLength += b' ' * (HEADER - len(sendLength))
+                        #client.send(sendLength)
+                        client.send(data)
 
-                try:
-                    data = fin.read(HEADER)  # Đọc tối đa 1KB mỗi lần
-                    if not data:
-                        return finish_progress()  # Nếu không còn dữ liệu, kết thúc
-                    
-                    finLength = len(data)
-                    sendLength = str(finLength).encode(FORMAT)
-                    sendLength += b' ' * (HEADER - len(sendLength))
-                    client.send(sendLength)
-                    client.send(data)
-
-                    totalBytes += len(data)
-            
-                    process = (totalBytes / sizeOfFile) * 100
-                    progress_bar["value"] = process
-                    percent_label.config(text=f"{process:.2f}%")
-                    upload_window.update_idletasks()  # Cập nhật giao diện
-                    upload_window.after(100,upload_progress)  # Gọi lại hàm sau 100ms
-                    sys.stdout.write(f"\rProcess: {process:.2f}%")  # Hiển thị trên một dòng
-                    sys.stdout.flush()  # Cập nhật ngay lập tức
-                except Exception as e:
-                    #print(f"Error during upload: {e}")
-                    progress_label.config(text="Upload Failed!")
-                    upload_window.after(2000, upload_window.destroy)
-                    return finish_progress()
+                        totalBytes += len(data)
+                
+                        process = (totalBytes / sizeOfFile) * 100
+                        progress_bar["value"] = process
+                        percent_label.config(text=f"{process:.2f}%")
+                        upload_window.update_idletasks()  # Cập nhật giao diện
+                        #upload_window.after(100,upload_progress)  # Gọi lại hàm sau 100ms
+                        sys.stdout.write(f"\rProcess: {process:.2f}%")  # Hiển thị trên một dòng
+                        sys.stdout.flush()  # Cập nhật ngay lập tức
+                    except Exception as e:
+                        # print(f"Error during upload: {e}")
+                        # print("Error during upload")
+                        progress_label.config(text="Upload Failed!")
+                        upload_window.after(2000, upload_window.destroy)
+                        return finish_progress()
                 
             upload_progress()
             upload_window.wait_window()  # Chờ cửa sổ tải lên đóng
@@ -336,17 +340,19 @@ def main(username):
                 name = receive_message()
                 size = int(receive_message())
                 date = receive_message()
+                path = receive_message()
                 #print(f"{numChild} - {name} - {size} - {date}")
                 # Nếu root chưa được khởi tạo
                 if root.name is None:
                     root.name = name
                     root.size = size
                     root.dateModified = date
+                    root.path = path
                     for i in range(numChild):
                         receive_preorder(root)
                 else:
                     # Nếu root đã được khởi tạo => Tạo node mới và thêm vào danh sách con
-                    newNode = Node(name, size, date)
+                    newNode = Node(name, size, date,path)
                     root.add_child(newNode)
                     root = newNode
                     for i in range(numChild):
@@ -401,7 +407,7 @@ def main(username):
                 if not selected_node.children: #Nếu nó không có con (Nghĩa là file)
                     if not directoryPath == '': #Nếu đã chọn fileName và đã chọn thư mục 
                         entry.delete(0, tk.END)  # Xóa nội dung cũ trong ô nhập
-                        entry.insert(0, f'download {selected_node.name}')# Thêm chuỗi download {file_path} vào ô nhập tin nhắn 
+                        entry.insert(0, f'download {selected_node.path}')# Thêm chuỗi download {file_path} vào ô nhập tin nhắn 
                         list_window.destroy()
                 else:
                     messagebox.showinfo("Thông báo", "Please select folder to save file", parent = list_window)
@@ -414,11 +420,11 @@ def main(username):
                 messagebox.showinfo("Thông báo", f"Folder selected: {directoryPath}", parent = list_window) #Đặt parent = list_window nhằm ngăn không cho nó minimize
 
         # Nhận dữ liệu
-        root_node = Node(None, None, None)
+        root_node = Node(None, None, None, None)
         receive_preorder(root_node)
         # Tạo cửa sổ hiển thị
         list_window = tk.Toplevel()
-        list_window.title("TreeView Example")
+        list_window.title("File from server")
         list_window.geometry("600x400")
         # Đặt chế độ modal để ngăn cửa sổ bị minimize
         list_window.grab_set()
@@ -465,7 +471,7 @@ def main(username):
         # Gắn sự kiện Double Click
         tree.bind("<Double-1>", on_double_click)
 
-    def receive_file(fileName):
+    def receive_file(path):
         global stop_sending
         stop_sending = '1'
         def finish_progress():
@@ -569,7 +575,7 @@ def main(username):
             return
         totalBytes = 0
         #Xử lí tên trùng
-    
+        fileName = os.path.basename(path)
         filePath = os.path.join(directoryPath,fileName)
         fout = open(filePath,"wb")
         start = time.time()  # Thời điểm bắt đầu
@@ -622,7 +628,7 @@ def main(username):
                     if os.path.isfile(path):
                         send_message(message)
                         isUploaded = upload_file(path)
-                    else:
+                    elif os.path.isdir(path):
                         send_message(f"upload_folder {path}")
                         isUploaded = upload_folder(path)
 
@@ -648,7 +654,6 @@ def main(username):
                         label.pack(side="left", padx=5)
                     else:
                         label_frame=tk.Frame(scrollable_frame, bg="white")
-                        label_frame.pack(side="top", fill="x", pady=(0, 3))
                         label = tk.Label(label_frame, text='Fail to download this file', font=("Tahoma", 15), bg="red", anchor="w")
                         label.pack(side="left",padx=5)
                 else:
@@ -657,10 +662,13 @@ def main(username):
     def click_logout():
         send_message("logout")
         root.after(500, lambda: menu_login())
-    server_label = tk.Label(root, text=f"{username} [{localIP}, {localPORT}]", font=("Arial", 15, "bold"),  bg="green", fg="yellow")
-    server_label.pack(padx=30, pady=10, side="top", anchor="w")
-    logout_button = tk.Button(root, text="LOGOUT", font=("Arial", 15, "bold"), bg = "red", fg="black",command=click_logout)
-    logout_button.place(x=560, y=8)
+
+    temp_frame = tk.Frame(root)
+    temp_frame.pack(padx=40, pady=(5, 10), fill="x")
+    server_label = tk.Label(temp_frame, text=f"{username} [{localIP}, {localPORT}]", font=("Arial", 15, "bold"),  bg="green", fg="yellow")
+    server_label.pack(side="left", anchor="w")
+    logout_button = tk.Button(temp_frame, text="LOGOUT", font=("Arial", 15, "bold"), bg = "red", fg="black",command=click_logout)
+    logout_button.pack(side="right", anchor="e")
     
     main_frame = tk.Frame(root, borderwidth=2, relief="solid")
     main_frame.pack(padx=20, pady=(5, 10), fill="both", expand=True)
